@@ -1,0 +1,1344 @@
+
+
+
+
+                                                            Xiaorui. HUO
+                                                             Haipeng. LI
+                                                          IMT Atlantique
+                                                       February 24, 2018
+
+
+             Group 10: c2w protocol specification proposal
+                           spec-r209-s18-g10
+
+Abstract
+
+   The document is a specification for a session protocol capable of
+   supporting the application Chat While Watching(c2w).The protocol is
+   used between clients and server.  The goal of this protocol is to
+   allow a client to chat with other users in the main room or movie
+   room.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Functions . . . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Message format  . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Type of Message . . . . . . . . . . . . . . . . . . . . . . .   4
+     3.1.  Connection To Main Room . . . . . . . . . . . . . . . . .   4
+     3.2.  Connection Successful . . . . . . . . . . . . . . . . . .   5
+     3.3.  Connection Failed . . . . . . . . . . . . . . . . . . . .   6
+     3.4.  List of All Users In Main Room  . . . . . . . . . . . . .   6
+     3.5.  List of All Movies In Main Room . . . . . . . . . . . . .   7
+     3.6.  User Sends Message to Server  . . . . . . . . . . . . . .   8
+     3.7.  Server Sends Message to All Users . . . . . . . . . . . .   9
+     3.8.  Enter One Movie Room  . . . . . . . . . . . . . . . . . .  10
+     3.9.  List of All Users in Movie Room . . . . . . . . . . . . .  11
+     3.10. Leave the Movie Room  . . . . . . . . . . . . . . . . . .  12
+     3.11. Leave the Main Room . . . . . . . . . . . . . . . . . . .  13
+     3.12. Error . . . . . . . . . . . . . . . . . . . . . . . . . .  13
+   4.  Reliability . . . . . . . . . . . . . . . . . . . . . . . . .  14
+   5.  Example scenario  . . . . . . . . . . . . . . . . . . . . . .  15
+     5.1.  Scenario 1: Login . . . . . . . . . . . . . . . . . . . .  15
+     5.2.  Scenario 2: User enters into a Movie Room . . . . . . . .  18
+     5.3.  Scenario 3: Users chat in the room  . . . . . . . . . . .  19
+     5.4.  Scenario 4: User leaves from a Movie Room . . . . . . . .  21
+     5.5.  Scenario 5: User leaves from a Main Room  . . . . . . . .  23
+   6.  Conclusion  . . . . . . . . . . . . . . . . . . . . . . . . .  24
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  24
+
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018                [Page 1]
+
+                              c2w-protocol                 February 2018
+
+
+1.  Introduction
+
+   The goal of the c2w protocol specification is to allow clients to
+   chat with other users in the main room or movie room.  For the sake
+   of simplicity, the message format is the same for all the messages.
+   This protocol is able to be implemented either with TCP or UDP.
+
+1.1.  Functions
+
+   When a client logins in to the server, he/she enters the name(or IP
+   address) and the port number of the server as well as his/her user-
+   name in the login window.  If the user-name is already used by other
+   client, this client will receive a connection failed message from the
+   server.
+
+   If login is successful, this client will be directed to the "main
+   room" and the server sends two messages to this client,one is the
+   list of all users in the system(specifying whether they are available
+   "A"(they are in the main room)or whether they are in a Movie room
+   "M"), the other one is the list of all the available movies.  The
+   user can send messages to other users in the main room.
+
+   While in the "main room", the user can join one of the movies, the
+   application shows a third window with the list of all the users in
+   this movie room.The user can send messages to other users in the
+   movie room and leave the movie room to go back to the main room.
+
+   The user can leave the main room and go back to the login window.
+
+2.  Message format
+
+   All messages have the same format, shown in figure Figure 1.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018                [Page 2]
+
+                              c2w-protocol                 February 2018
+
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |A|   |       |                               |                 |
+       |C| R | Type  |      Text Length              |                 |
+       |K|   |       |                               |                 |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+       |                                                               |
+       |                                                               |
+       .                                                               .
+       .                  Text(variable length)                        .
+       .                                                               .
+       |                                                               |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+                                 Figure 1
+
+   * ACK field(1 bit): This field is set to 1 to acknowledge a previous
+   message&#65292; the default value is 0.
+
+   * R field (2 bits) : This field indicates the type of corresponding
+   room.
+
+   00 : main room
+
+   01 : movie room
+
+   11 : other case
+
+   * Type field (4 bits) : This field indicates the type of each message
+   (refer to a table (definition of the type) for more details).
+
+   * Text Length field (16 bits): This field specifies the total length
+   in bytes of the Text.  The user must ensure that this field contains
+   the correct value.
+
+   * Text field (variable length): This field contains the contente that
+   is the object of the message, encoded in ASCII.
+
+
+
+
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018                [Page 3]
+
+                              c2w-protocol                 February 2018
+
+
+               +------+-----------------------------------+
+               | Type |            Message Name           |
+               +------+-----------------------------------+
+               | 0000 |      Connection To Main Room      |
+               | 0001 |       Connection Successful       |
+               | 0010 |         Connection Failed         |
+               | 0011 |   List of All Users In Main Room  |
+               | 0100 |  List of All Movies In Main Room  |
+               | 0101 |    User Sends Message to Server   |
+               | 0110 | Server Sends Message to All Users |
+               | 0111 |        Enter One Movie Room       |
+               | 1000 |  List of All Users in Movie Room  |
+               | 1001 |        Leave the Movie Room       |
+               | 1010 |        Leave the Main Room        |
+               | 1111 |               Error               |
+               +------+-----------------------------------+
+
+                      Table 1: Definition of the Type
+
+3.  Type of Message
+
+3.1.  Connection To Main Room
+
+   * Connection To Main Room : When a new client wants to login in to
+   the server, the client sends the request to server.
+
+   ACK : 0
+
+   R : 11
+
+   Type : 0000
+
+   Text Length : the total length in bytes of the Text field
+
+   Text : this field contains the user-name.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018                [Page 4]
+
+                              c2w-protocol                 February 2018
+
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |A|   |       |                               |                 |
+       |C| R | Type  |      Text Length              |                 |
+       |K|   |       |                               |                 |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+       |                                                               |
+       |                                                               |
+       .                    User-name                                  .
+       .                                                               .
+       .                                                               .
+       |                                                               |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+                                 Figure 2
+
+3.2.  Connection Successful
+
+   * Connection Successful : If the client connects successfully to the
+   main room, the server sends a message to the client.
+
+   ACK : 0
+
+   R : 11
+
+   Type : 0001
+
+   Text length : 0
+
+   Text : this field is empty.
+
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |A|   |       |                               |
+       |C| R | Type  |      Text Length              |
+       |K|   |       |                               |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+
+                                 Figure 3
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018                [Page 5]
+
+                              c2w-protocol                 February 2018
+
+
+3.3.  Connection Failed
+
+   * Connection Failed : If the user-name is already used by other
+   users, the client connects unsuccessfully to the main room, the
+   server sends this message to the client.
+
+   ACK : 0
+
+   R : 11
+
+   Type : 0010
+
+   Text length : 0
+
+   Text : this field is empty.
+
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |A|   |       |                               |
+       |C| R | Type  |      Text Length              |
+       |K|   |       |                               |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+
+                                 Figure 4
+
+3.4.  List of All Users In Main Room
+
+   * List of All Users In Main Room : When the client enters the main
+   room, the server sends a message which contains the list of all users
+   in the main room.
+
+   ACK : 0
+
+   R : 00
+
+   Type : 0011
+
+   Text length : the total length in bytes of the Text field
+
+   Text : this field contains the list of all names of users and their
+   status as well as the number of users.
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018                [Page 6]
+
+                              c2w-protocol                 February 2018
+
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |A|   |       |                               |                 |
+       |C| R | Type  |      Text Length              | Number of users |
+       |K|   |       |                               |                 |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+       | Statu of user 1     Name of user 1                            |
+       |                                                               |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                  .
+                                  .
+       .                                                               .
+       .                                                               .
+       |  Statu of user N     Name of user N                           |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+                                 Figure 5
+
+3.5.  List of All Movies In Main Room
+
+   * List of All Movies In Main Room : When the client enters the main
+   room, the server sends a message which contains the list of all
+   movies in the main room.
+
+   ACK : 0
+
+   R : 00
+
+   Type : 0100
+
+   Text length : the total length in bytes of the Text field
+
+   Text : this field contains the list of all names of movies and their
+   IP Address as well as the number of movies.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018                [Page 7]
+
+                              c2w-protocol                 February 2018
+
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |A|   |       |                               |                 |
+       |C| R | Type  |      Text Length              | Number of movies|
+       |K|   |       |                               |                 |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+       | IP Address of movie 1     Name of movie 1                     |
+       |                                                               |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                  .
+                                  .
+       .                                                               .
+       .                                                               .
+       | IP Address of movie N     Name of movie N                     |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+                                 Figure 6
+
+3.6.  User Sends Message to Server
+
+   * User Sends Message to Server: When the client chats with other
+   users in the main room or movie room, the client sends message to the
+   server.
+
+   ACK : 0
+
+   R : 00/01
+
+   Type : 0101
+
+   Text length : the total length in bytes of the Text field
+
+   Text : this field contains the content of chatting as well as the
+   user-name.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018                [Page 8]
+
+                              c2w-protocol                 February 2018
+
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |A|   |       |                               |                 |
+       |C| R | Type  |      Text Length              |                 |
+       |K|   |       |                               |                 |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+       |                                                               |
+       |                                                               |
+       . User-name    Content of chatting                              .
+       .                                                               .
+       .                                                               .
+       |                                                               |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+                                 Figure 7
+
+3.7.  Server Sends Message to All Users
+
+   * Server Sends Message to All Users: Once server receives a message,
+   he will send this message to all the users in certain room.
+
+   ACK : 0
+
+   R : 00/01
+
+   Type : 0110
+
+   Text length : the total length in bytes of the Text field
+
+   Text : this field contains the content of chatting as well as the
+   user-name.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018                [Page 9]
+
+                              c2w-protocol                 February 2018
+
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |A|   |       |                               |                 |
+       |C| R | Type  |      Text Length              |                 |
+       |K|   |       |                               |                 |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+       |                                                               |
+       |                                                               |
+       . User-name    Content of chatting                              .
+       .                                                               .
+       .                                                               .
+       |                                                               |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+                                 Figure 8
+
+3.8.  Enter One Movie Room
+
+   * Enter One Movie Room: Set when a client wants to enter one movie
+   room.
+
+   ACK : 0
+
+   R : 00
+
+   Type : 0111
+
+   Text length : the total length in bytes of the Text field
+
+   Text : this field contains the movie-name.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 10]
+
+                              c2w-protocol                 February 2018
+
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |A|   |       |                               |                 |
+       |C| R | Type  |      Text Length              |                 |
+       |K|   |       |                               |                 |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+       |                                                               |
+       |                                                               |
+       .                    Name of movie                              .
+       .                                                               .
+       |                                                               |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+                                 Figure 9
+
+3.9.  List of All Users in Movie Room
+
+   * List of All Users in Movie Room: When the client enters the room,
+   the server sends a message which contains the list of all users in
+   the main room.
+
+   ACK : 0
+
+   R : 01
+
+   Type : 1000
+
+   Text length : the total length in bytes of the Text field
+
+   Text : this field contains the list of all names of users as well as
+   the number of users in movie room.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 11]
+
+                              c2w-protocol                 February 2018
+
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |A|   |       |                               |                 |
+       |C| R | Type  |      Text Length              | Number of users |
+       |K|   |       |                               |                 |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+       |     Name of user 1                                            |
+       |                                                               |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                  .
+                                  .
+       .                                                               .
+       .                                                               .
+       |      Name of user N                                           |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+                                 Figure 10
+
+3.10.  Leave the Movie Room
+
+   * Leave the Movie Room : Indicates that a client wants to leave the
+   movie room and he should be back to main room.
+
+   ACK : 0
+
+   R : 01
+
+   Type : 1001
+
+   Text length : 0
+
+   Text : this field is empty.
+
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |A|   |       |                               |
+       |C| R | Type  |      Text Length              |
+       |K|   |       |                               |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+
+                                 Figure 11
+
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 12]
+
+                              c2w-protocol                 February 2018
+
+
+3.11.  Leave the Main Room
+
+   * Leave the Main Room: Indicates that a client wants to leave the
+   main room and he should be back to login window.
+
+   ACK : 0
+
+   R : 00
+
+   Type : 1010
+
+   Text length : 0
+
+   Text : this field is empty.
+
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |A|   |       |                               |
+       |C| R | Type  |      Text Length              |
+       |K|   |       |                               |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+
+                                 Figure 12
+
+3.12.  Error
+
+   * Error: Invalide Message means all the other errors.
+
+   ACK : 1
+
+   R : 11
+
+   Type : 1111
+
+   Text length : the total length in bytes of the Text field
+
+   Text : this field indicates the type of error(refer to a table(Type
+   of error) for more details).  The first byte is used to indicate.
+
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 13]
+
+                              c2w-protocol                 February 2018
+
+
+                 +----------+---------------------------+
+                 |   Type   |         Error Name        |
+                 +----------+---------------------------+
+                 | 00000000 | Illegal Format of Message |
+                 | 00000001 |       Main room full      |
+                 | 00000010 |      Movie room full      |
+                 | 00000011 |      Movie list full      |
+                 +----------+---------------------------+
+
+                          Table 2: Type of error
+
+   Illegal Format of Message : the length of a message sent by the
+   client must be lower than 300 bytes.
+
+   Main room full : The number of users in the main name should be less
+   than 255.
+
+   Movie room full : The number of users in the movie name should be
+   less than 255.
+
+   Movie list full : The list of movies should be less than 255.
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |A|   |       |                               |                 |
+       |C| R | Type  |      Text Length              |                 |
+       |K|   |       |                               |                 |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+       |                                                               |
+       |                                                               |
+       .                    Type of error                              .
+       .                                                               .
+       |                                                               |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+                                 Figure 13
+
+4.  Reliability
+
+   When a client sent a request, but he hasn't received a ACK reply.  In
+   order not to overload servers, clients should wait at least 2 seconds
+   before resending a request.
+
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 14]
+
+                              c2w-protocol                 February 2018
+
+
+5.  Example scenario
+
+   The values of each field are hexadecimal.
+
+5.1.  Scenario 1: Login
+
+   This first scenario describes the case where a new client 'Alice'.
+   Alice sends a Login Request to the server.  Once the server receives
+   that request, he will judge whether the login request is legal, if
+   correct the server will send the ML(movie list) and UL(user list) to
+   Alice, then again the server will send the new UL to other users(i.g.
+   one man called Bob) in the MR(main room).In this case, we assume that
+   it exists just one film called "fiction" in the ML, and the users are
+   Alice and Bob.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 15]
+
+                              c2w-protocol                 February 2018
+
+
+        Alice                            Server                    Bob
+           |                               |                        |
+           |   Msg 1 (Login Request)       |                        |
+           |------------------------------>|                        |
+           |                               |                        |
+           |                               |                        |
+           |  Msg 2 (Connection successful)|                        |
+           |<------------------------------|                        |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 3 (Movie List)          |                        |
+           |------------------------------>|                        |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 4 (Movie List ACK)      |                        |
+           |<------------------------------|                        |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 5 (User List)           |                        |
+           |------------------------------>|                        |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 6 (User List ACK)       |                        |
+           |<------------------------------|                        |
+           |                               |                        |
+           |                               |    Msg 7 (User List)   |
+           |                               |----------------------->|
+           |                               |                        |
+           |                               |  Msg 8 (User List ACK) |
+           |                               |<-----------------------|
+           |                               |                        |
+           |                               |                        |
+
+
+
+   Msg 1 (Login Request)
+
+   ACK: 0
+
+   R: 03
+
+   Type: 00
+
+   Text Length: 05
+
+   Text : 41 6c 69 63 65
+
+   Msg 2 (Connection successful)
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 16]
+
+                              c2w-protocol                 February 2018
+
+
+   ACK: 0
+
+   R: 03
+
+   Type: 01
+
+   Text Length: 00
+
+   Msg 3 (Movie List)
+
+   ACK: 0
+
+   R: 00
+
+   Type: 04
+
+   Text Length: 08
+
+   Text : 01 66 69 63 74 69 6f 6e
+
+   Msg 4 (Movie List ACK)
+
+   ACK: 1
+
+   R: 00
+
+   Type: 04
+
+   Text Length: 00
+
+   Msg 5 (User List)
+
+   ACK: 0
+
+   R: 00
+
+   Type: 03
+
+   Text Length: 0B
+
+   Text : 02 4e 41 6c 69 63 65 4e 42 6f 62
+
+   Msg 6 (User List ACK)
+
+   ACK: 1
+
+   R: 00
+
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 17]
+
+                              c2w-protocol                 February 2018
+
+
+   Type: 03
+
+   Text Length: 00
+
+5.2.  Scenario 2: User enters into a Movie Room
+
+   Alice decides to enter a Movie Room called "fiction", she will send a
+   room request to the server, then the server responses the room
+   request ACK to her as well as the User List.Then the server will send
+   the newest User List to the users who were already in the Movie Room,
+   for example here Bob.
+
+
+
+        Alice                            Server                    Bob
+           |                               |                        |
+           |   Msg 1 (Room Request)        |                        |
+           |------------------------------>|                        |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 2 ( Room Request ACK)   |                        |
+           |<------------------------------|                        |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 3 (User List)           |                        |
+           |------------------------------>|                        |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 4 (User List ACK)       |                        |
+           |<------------------------------|                        |
+           |                               |                        |
+           |                               |                        |
+           |                               |                        |
+           |                               |    Msg 5 (User List)   |
+           |                               |----------------------->|
+           |                               |                        |
+           |                               |  Msg 6 (User List ACK) |
+           |                               |<-----------------------|
+           |                               |                        |
+           |                               |                        |
+
+
+
+   Msg 1 (Room Request)
+
+   ACK: 0
+
+   R: 00
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 18]
+
+                              c2w-protocol                 February 2018
+
+
+   Type: 07
+
+   Text Length: 07
+
+   Text : 66 69 63 74 69 6f 6e
+
+   Msg 2 (Room Request ACK)
+
+   ACK: 1
+
+   R: 00
+
+   Type: 07
+
+   Text Length: 00
+
+   Msg 3 (User List)
+
+   ACK: 0
+
+   R: 01
+
+   Type: 08
+
+   Text Length: 09
+
+   Text : 02 41 6c 69 63 65 42 6f 62
+
+   Msg 4 (User List ACK)
+
+   ACK: 1
+
+   R: 00
+
+   Type: 08
+
+   Text Length: 00
+
+5.3.  Scenario 3: Users chat in the room
+
+   We suppose that Alice and Bob were in the same room(for example,they
+   are in Movie Room), and Alice wants to chat with Bob, Alice will send
+   a message to the server,and the server will response a ACK again.
+   Finally, the server will send a message to Bob, and so on Bob will
+   generate a ACK back to server,vice versa.
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 19]
+
+                              c2w-protocol                 February 2018
+
+
+        Alice                            Server                      Bob
+           |                               |                          |
+           | Msg 1 (Message Request)       |                          |
+           |------------------------------>|                          |
+           |                               |                          |
+           |                               |                          |
+           | Msg 2 ( Message Request ACK)  |                          |
+           |<------------------------------|                          |
+           |                               |                          |
+           |                               |                          |
+           |                               | Msg 3 (Message Request)  |
+           |                               |------------------------->|
+           |                               |                          |
+           |                               |Msg 4(Message Request ACK)|
+           |                               |<-------------------------|
+           |                               |                          |
+           |                               |                          |
+           |                               | Msg 5(Message Request)   |
+           |                               |<-------------------------|
+           |                               |                          |
+           |                               |Msg 6(Message Request ACK)|
+           |                               |------------------------->|
+           |                               |                          |
+           | Msg 7( Message Request )      |                          |
+           |<------------------------------|                          |
+           | Msg 8(Message Request ACK)    |                          |
+           |------------------------------>|                          |
+           |                               |                          |
+
+
+   Msg 1 (Message Request)
+
+   ACK: 0
+
+   R: 01
+
+   Type: 05
+
+   Text Length: 0A
+
+   Text : 41 6c 69 63 65 48 65 6c 6c 6f
+
+   Msg 2 (Message Request ACK)
+
+   ACK: 1
+
+   R: 01
+
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 20]
+
+                              c2w-protocol                 February 2018
+
+
+   Type: 05
+
+   Text Length: 00
+
+   Msg 3 (Message Request)
+
+   ACK: 0
+
+   R: 01
+
+   Type: 06
+
+   Text Length: 0A
+
+   Text : 41 6c 69 63 65 48 65 6c 6c 6f
+
+   Msg 4 (Message Request ACK)
+
+   ACK: 1
+
+   R: 01
+
+   Type: 06
+
+   Text Length: 00
+
+5.4.  Scenario 4: User leaves from a Movie Room
+
+   Alice decides to leave the Movie Room, she will send a leave request
+   to the server,then the server responses the leave request ACK to her
+   as well as the User List of Main Room.  Then the server will send the
+   newest User List to the users who were already in the Main Room.  (we
+   assume that Bob was in the Main Room)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 21]
+
+                              c2w-protocol                 February 2018
+
+
+        Alice                            Server                    Bob
+           |                               |                        |
+           |   Msg 1 (Leave Request)       |                        |
+           |------------------------------>|                        |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 2 ( Leave Request ACK)  |                        |
+           |<------------------------------|                        |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 3 (User List)           |                        |
+           |------------------------------>|                        |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 4 (User List ACK)       |                        |
+           |<------------------------------|                        |
+           |                               |                        |
+           |                               |                        |
+           |                               |                        |
+           |                               |    Msg 5 (User List)   |
+           |                               |----------------------->|
+           |                               |                        |
+           |                               |  Msg 6 (User List ACK) |
+           |                               |<-----------------------|
+           |                               |                        |
+           |                               |                        |
+
+
+
+   Msg 1 (Leave Request)
+
+   ACK: 0
+
+   R: 01
+
+   Type: 09
+
+   Text Length: 00
+
+   Msg 2 (Leave Request ACK)
+
+   ACK: 1
+
+   R: 01
+
+   Type: 09
+
+   Text Length: 00
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 22]
+
+                              c2w-protocol                 February 2018
+
+
+5.5.  Scenario 5: User leaves from a Main Room
+
+   Alice decides to leave the Main Room, she will send a leave request
+   to the server, then the server responses the leave request ACK to
+   her.
+
+
+
+        Alice                            Server                    Bob
+           |                               |                        |
+           |   Msg 1 (Leave Request)       |                        |
+           |------------------------------>|                        |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 2 ( Leave Request ACK)  |                        |
+           |<------------------------------|                        |
+           |                               |                        |
+           |                               |                        |
+           |                               |                        |
+           |                               |    Msg 3(User List)    |
+           |                               |----------------------->|
+           |                               |                        |
+           |                               |  Msg 4 (User List ACK) |
+           |                               |<-----------------------|
+           |                               |                        |
+           |                               |                        |
+
+
+
+   Msg 1 (Leave Request)
+
+   ACK: 0
+
+   R: 00
+
+   Type: 0A
+
+   Text Length: 00
+
+   Msg 2 (Leave Request ACK)
+
+   ACK: 1
+
+   R: 00
+
+   Type: 0A
+
+   Text Length: 00
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 23]
+
+                              c2w-protocol                 February 2018
+
+
+6.  Conclusion
+
+   In conclusion, this specification is to allow clients to chat with
+   other users in the main room or movie room.  We use the same message
+   format for transferring.  By defining the type of message, we
+   distinguish different functions.  Considering the loss of the
+   message, we use ACK to ensure the reception of the message.
+
+Authors' Addresses
+
+   Xiaorui HUO
+   IMT Atlantique
+   Brest
+   France
+
+   Email: xiaorui.huo@telecom-bretagne.eu
+
+
+   Haipeng LI
+   IMT Atlantique
+   Brest
+   France
+
+   Email: haipeng.li@telecom-bretagne.eu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 28, 2018               [Page 24]

@@ -1,0 +1,336 @@
+
+
+
+
+                                                            Xiaorui. HUO
+                                                             Haipeng. LI
+                                                          IMT Atlantique
+                                                       February 21, 2018
+
+
+             Group 10: c2w protocol specification proposal
+                     draft-ietf-xml2rfc-template-05
+
+Abstract
+
+   The document is a specification for a session protocol capable of
+   supporting the application Chat While Watching(c2w).The protocol is
+   used between clients and a server.  The goal of this protocol is to
+   allow a client to chat with other users in the main room or movie
+   room.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   1
+     1.1.  Functions . . . . . . . . . . . . . . . . . . . . . . . .   1
+   2.  Message format  . . . . . . . . . . . . . . . . . . . . . . .   2
+   3.  Type of Message . . . . . . . . . . . . . . . . . . . . . . .   3
+   4.  Example scenario  . . . . . . . . . . . . . . . . . . . . . .   4
+     4.1.  Scenario 1: Login . . . . . . . . . . . . . . . . . . . .   4
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   5
+
+1.  Introduction
+
+   The goal of the c2w protocol specification is to allow clients to
+   chat with other users in the main room or movie room.  For the sake
+   of simplicity, the message format is the same for all the messages.
+   This protocol is able to be implemented either with TCP or UDP.
+
+1.1.  Functions
+
+   When a client logins in to the server, he/she enters the name(or IP
+   address) and the port number of the server as well as his/her user-
+   name in the login window.  If the user-name is already used by other
+   client, this client will receive an error message from the server.
+
+   If login is successful, this client will be directed to the "main
+   room" and the server send two messages to this client,one is the list
+   of all users in the system(specifying whether they are available
+   "A"(they are in the main room)or whether they are in a Movie room
+   "M"), the other is the list of all the available movies.  The user
+   can send messages to other users in the main room.
+
+
+
+
+HUO & LI                 Expires August 25, 2018                [Page 1]
+
+                            Abbreviated Title              February 2018
+
+
+   While in the "main room", the user can join one of the movies, the
+   application shows a third window with the list of all the users in
+   this movie room.The user can send messages to other users in the
+   movie room and leave the movie room to go back to the main room.
+
+   The user can leave the main room and go back to the login window.
+
+2.  Message format
+
+   All messages have the same format, shown in figure Figure 1.
+
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |A|       |                               |                     |
+       |C| Type  |       Text Length             |                     |
+       |K|       |                               |                     |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |                                                               |
+       |                                                               |
+       .                                                               .
+       .                  Text(variable length)                        .
+       .                                                               .
+       |                                                               |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+                                 Figure 1
+
+   * ACK field(1 bit): This field indicates whether 1: the message is
+   well received by the server as well as it is well executed.  0: the
+   message is well received be the server, but the message makes the
+   error.
+
+   * Type field (4 bits) : This field indicates the type of each message
+   (refer to a table (definition of the type) for more details).
+
+   * Text Length field (16 bits): This field specifies the total length
+   in bytes of the Text.  The user MUST ensure that this field contains
+   the correct value.
+
+   * Text field (variable length): This field contains the contente that
+   is the object of the message, encoded in ASCII.
+
+
+
+
+
+
+
+HUO & LI                 Expires August 25, 2018                [Page 2]
+
+                            Abbreviated Title              February 2018
+
+
+               +------+-----------------------------------+
+               | Type |            Message Name           |
+               +------+-----------------------------------+
+               | 0000 |      Connection To Main Room      |
+               | 0001 |       Connection Successful       |
+               | 0010 |         Connection Failed         |
+               | 0011 |   List of All Users In Main Room  |
+               | 0100 |  List of All Movies In Main Room  |
+               | 0101 |    User Sends Message to Server   |
+               | 0110 | Server Sends Message to All Users |
+               | 0111 |        Enter One Movie Room       |
+               | 1000 |  List of All Users in Movie Room  |
+               | 1001 |        Leave the Movie Room       |
+               | 1010 |        Leave the Movie Room       |
+               +------+-----------------------------------+
+
+                      Table 1: Definition of the Type
+
+3.  Type of Message
+
+   * 1.  Connection To Main Room : When a new client wants to login in
+   to the server, the client sends the request to server.  Type : value
+   0000 Text Length : the total length in bytes of the Text field Text :
+   this field contains IP address and port number of the server as well
+   as the user-name.
+
+   * 2.  Connection Successful : If the client connects successfully to
+   the main room, the server sends a message to the client.  Type :
+   value 0001 Text length : value 0
+
+   * 3.  Connection Failed : If the user-name is already used by other
+   users, the client connects unsuccessfully to the main room, the
+   server sends an error message to the client.  Type : value 0010 Text
+   length : value 0
+
+   * 4.  List of All Users In Main Room : When the client enters the
+   main room, the server sends a message which contains the list of all
+   users in the main room.  Type : value 0011 Text length : the total
+   length in bytes of the Text field Text : this field contains the list
+   of all names of users and their status.
+
+   * 5.  List of All Movies In Main Room : When the client enters the
+   main room, the server sends a message which contains the list of all
+   movies in the main room.  Type : value 0100 Text length : the total
+   length in bytes of the Text field Text : this field contains the list
+   of all names of movies and their IP Address.
+
+
+
+
+
+HUO & LI                 Expires August 25, 2018                [Page 3]
+
+                            Abbreviated Title              February 2018
+
+
+   * 6.  User Sends Message to Server: When the client chat with other
+   users, the client sends message to the server.  Type : value 0101
+   Text length : the total length in bytes of the Text field Text : this
+   field contains the content of chatting as well as the user-name.
+
+   * 7.  Server Sends Message to All Users: Once server receives a
+   message, he will send this message to all the users in certain room.
+   Type : value 0110 Text length : the total length in bytes of the Text
+   field Text : this field contains the content of chatting as well as
+   the user-name.
+
+   * 8.  Enter One Movie Room: Set when a client wants to enter one
+   movie room.  Type : value 0111 Text length : the total length in
+   bytes of the Text field Text : this field contains IP address of the
+   movie as well as the movie-name.
+
+   * 9.  List of All Users in Movie Room: When the client enters the
+   room, the server sends a message which contains the list of all users
+   and their status in the main room.  Type : value 1000 Text length :
+   the total length in bytes of the Text field Text : this field
+   contains the list of all names of users in movie room.
+
+   * 10.  Leave the Movie Room : Indicates that a client wants to leave
+   the movie room and he should be back to main room.  Type : value 1001
+   Text length : value 0
+
+   * 11.  Leave the Main Room: Indicates that a client wants to leave
+   the main room and he should be back to login window.  Type : value
+   1010 Text length : value 0
+
+4.  Example scenario
+
+4.1.  Scenario 1: Login
+
+   This first scenario describes the case where a new client 'Alice'.
+   Alice sends a Login Request to the server.  Once the server receives
+   that request, he will judge whether the login request is legal, if
+   correct the server will send the ML(movie list) and UL(user list) to
+   Alice, then again the server will send the new UL to other users(i.g.
+   one man called Paul) in the MR(main room).In this case, we assume
+   that it exists just one film called "pulp fiction" in the ML, and the
+   users are Alice and Paul.
+
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 25, 2018                [Page 4]
+
+                            Abbreviated Title              February 2018
+
+
+        Alice                            Server                    Paul
+           |                               |                        |
+           |   Msg 1 (Login Request)       |                        |
+           |----------------------------->|                      |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 2 (Request Legal)       |                        |
+          |<----------------------------|                        |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 3 (Movie List)          |                        |
+           |----------------------------->|                      |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 4 (Movie List ACK)      |                        |
+          |<----------------------------|                        |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 5 (User List)           |                        |
+           |----------------------------->|                      |
+           |                               |                        |
+           |                               |                        |
+           |   Msg 6 (User List ACK)       |                        |
+          |<----------------------------|                        |
+           |                               |                        |
+           |                               |    Msg 7 (User List)   |
+           |                               |---------------------->|
+           |                               |                        |
+           |                               |  Msg 8 (User List ACK) |
+           |                              |<---------------------|
+           |                               |                        |
+           |                               |                        |
+
+
+
+Authors' Addresses
+
+   Firstname Lastname
+   IMT Atlantique
+   Brest
+   France
+
+   Email: firstname.lastname@telecom-bretagne.eu
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 25, 2018                [Page 5]
+
+                            Abbreviated Title              February 2018
+
+
+   Firstname Lastname
+   IMT Atlantique
+   Brest
+   France
+
+   Email: firstname.lastname@telecom-bretagne.eu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HUO & LI                 Expires August 25, 2018                [Page 6]

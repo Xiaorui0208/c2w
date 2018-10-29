@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This template is for creating an Internet Draft using xml2rfc,
+     which is available here: http://xml.resource.org. -->
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!-- One method to get references from the online citation libraries.
+     There has to be one entity for each item to be referenced.
+     An alternate method (rfc include) is described in the references. -->
+
+<!ENTITY RFC2629 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2629.xml">
+]>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs),
+     please see http://xml.resource.org/authoring/README.html. -->
+<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
+     (Here they are set differently than their defaults in xml2rfc v1.32) -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes"?>
+<!-- generate a ToC -->
+<?rfc tocdepth="4"?>
+<!-- the number of levels of subsections in ToC. default: 3 -->
+<!-- control references -->
+<?rfc symrefs="yes"?>
+<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
+<?rfc sortrefs="yes" ?>
+<!-- sort the reference entries alphabetically -->
+<!-- control vertical white space
+     (using these PIs as follows is recommended by the RFC Editor) -->
+<?rfc compact="yes" ?>
+<!-- do not start each main section on a new page -->
+<?rfc subcompact="no" ?>
+<!-- do not display copyright and other IETF-related stuff -->
+<?rfc private="(c) GROUP XXXX, 2013" ?>
+
+<rfc category="info" docName="draft-ietf-xml2rfc-template-05" ipr="trust200902">
+  <!-- category values: std, bcp, info, exp, and historic
+     ipr values: full3667, noModification3667, noDerivatives3667
+     you can add the attributes updates="NNNN" and obsoletes="NNNN"
+     they will automatically be output with "(if approved)" -->
+
+  <!-- ***** FRONT MATTER ***** -->
+
+  <front>
+    <!-- The abbreviated title is used in the page header - it is only necessary if the
+         full title is longer than 39 characters -->
+
+    <title abbrev="Abbreviated Title">Group 10: c2w protocol specification proposal
+    </title>
+
+    <!-- add 'role="editor"' below for the editors if appropriate -->
+
+
+    <author fullname="Firstname Lastname" initials="Xiaorui"
+            surname="HUO">
+      <organization>IMT Atlantique</organization>
+
+      <address>
+        <postal>
+          <street></street>
+
+          <!-- Reorder these if your country does things differently -->
+
+          <city>Brest</city>
+
+          <region></region>
+
+          <code></code>
+
+          <country>France</country>
+        </postal>
+
+
+
+        <email>firstname.lastname@telecom-bretagne.eu</email>
+
+        <!-- uri and facsimile elements may also be added -->
+      </address>
+    </author>
+    
+    <author fullname="Firstname Lastname" initials="Haipeng"
+            surname="LI">
+      <organization>IMT Atlantique</organization>
+
+      <address>
+        <postal>
+          <street></street>
+
+          <!-- Reorder these if your country does things differently -->
+
+          <city>Brest</city>
+
+          <region></region>
+
+          <code></code>
+
+          <country>France</country>
+        </postal>
+
+
+
+        <email>firstname.lastname@telecom-bretagne.eu</email>
+
+        <!-- uri and facsimile elements may also be added -->
+      </address>
+    </author>                                                                        
+    
+
+    <date month="Feb" year="2018" />
+
+    <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
+         in the current day for you. If only the current year is specified, xml2rfc will fill
+	 in the current day and month for you. If the year is not the current one, it is
+	 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the
+	 purpose of calculating the expiry date).  With drafts it is normally sufficient to
+	 specify just the year. -->
+
+    <keyword>c2w</keyword>
+
+    <!-- Keywords will be incorporated into HTML output
+         files in a meta tag but they have no effect on text or nroff
+         output. If you submit your draft to the RFC Editor, the
+         keywords will be used for the search engine. -->
+
+    <abstract>
+      <t>
+      The document is a specification for a session protocol capable of supporting the
+      application Chat While Watching(c2w).The protocol is used between clients and a server.
+      The goal of this protocol is to allow a client to chat with other users in the main 
+      room or movie room.
+      </t>
+    </abstract>
+  </front>
+
+  <middle>
+ 
+    <section title="Introduction">
+      <t>
+      The goal of the c2w protocol specification is to allow clients to chat with other 
+      users in the main room or movie room. For the sake of simplicity, the message format 
+      is the same for all the messages. This protocol is able to be implemented either with
+      TCP or UDP.
+      </t>
+    
+    <section title="Functions">
+      <t>
+      When a client logins in to the server, he/she enters the name(or IP address) and the 
+      port number of the server as well as his/her user-name in the login window. If the 
+      user-name is already used by other client, this client will receive an error message 
+      from the server.
+      </t>
+      
+      <t>
+      If login is successful, this client will be directed to the "main room" and the server
+      send two messages to this client,one is the list of all users in the system(specifying
+      whether they are available "A"(they are in the main room)or whether they are in a Movie
+      room "M"), the other is the list of all the available movies. The user can send messages 
+      to other users in the main room.
+      </t>
+      
+      <t>
+      While in the "main room", the user can join one of the movies, the application shows a
+      third window with the list of all the users in this movie room.The user can send messages 
+      to other users in the movie room and leave the movie room to go back to the main room.
+      </t>
+      
+      <t>
+      The user can leave the main room and go back to the login window.
+      </t>
+
+
+    </section><!--End of function-->
+    </section><!--End of introduction-->
+
+    <section title="Message format">
+    <t>
+    All messages have the same format, shown in figure Figure 1.
+    </t>
+
+    <t>
+    <figure align="center" anchor="sample_pkt">
+    <artwork>
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |A|       |                               |                     |
+    |C| Type  |       Text Length             |                     |
+    |K|       |                               |                     |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                                                               |
+    |                                                               |
+    .                                                               .
+    .                  Text(variable length)	                    .
+    .                                                               .
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    
+    </artwork></figure></t>
+
+    <t>
+    * ACK field(1 bit): This field indicates whether  
+    
+      1: the message is well received by the server as well as it is well executed.
+      0: the message is well received be the server, but the message makes the error.
+    </t>
+    
+    <t>
+    * Type field (4 bits) : This field indicates the type of each message (refer to a table
+      (definition of the type) for more details).
+    </t>
+    
+    <t>
+    * Text Length field (16 bits): This field specifies the total length in bytes of the Text. 
+      The user MUST ensure that this field contains the correct value.
+    </t>
+    
+    <t>
+    * Text field (variable length): This field contains the contente that is the object of the
+      message, encoded in ASCII.  
+    </t>
+    
+    <texttable anchor="table_example" title="Definition of the Type">
+
+          <ttcol align="center">Type</ttcol>
+
+          <ttcol align="center">Message Name</ttcol>
+
+          <c>0000</c>
+
+          <c>Connection To Main Room</c>
+
+          <c>0001</c>
+
+          <c>Connection Successful</c>
+
+          <c>0010</c>
+
+          <c>Connection Failed </c>
+   
+          <c>0011</c>
+
+          <c>List of All Users In Main Room </c>
+
+          <c>0100</c>
+
+          <c>List of All Movies In Main Room</c>
+
+          <c>0101</c>
+
+          <c>User Sends Message to Server</c>
+
+          <c>0110</c>
+
+          <c>Server Sends Message to All Users</c>
+
+          <c>0111</c>
+
+          <c>Enter One Movie Room </c>
+
+          <c>1000</c>
+
+          <c>List of All Users in Movie Room</c>
+ 
+          <c>1001</c>
+
+          <c>Leave the Movie Room</c>
+ 
+          <c>1010</c>
+
+          <c>Leave the Movie Room</c>
+
+    </texttable>
+    
+    </section>
+
+    <section title="Type of Message">
+    <t>
+     * 1. Connection To Main Room : When a new client wants to login in to the server, the client
+       sends the request to server.
+       Type : value 0000
+       Text Length : the total length in bytes of the Text field
+       Text : this field contains IP address and port number of the server as well as the user-name.
+    </t>
+    
+    <t>
+     * 2. Connection Successful : If the client connects successfully to the main room, the server
+       sends a message to the client.
+       Type : value 0001
+       Text length : value 0
+    </t>
+     
+     <t>  
+     * 3. Connection Failed : If the user-name is already used by other users, the client connects
+       unsuccessfully to the main room, the server sends an error message to the client.
+       Type : value 0010
+       Text length : value 0
+      </t>
+       
+     <t>
+     * 4. List of All Users In Main Room : When the client enters the main room, the server sends a
+       message which contains the list of all users in the main room.
+       Type : value 0011
+       Text length : the total length in bytes of the Text field
+       Text : this field contains the list of all names of users and their status.
+     </t>
+     
+     <t>
+     * 5. List of All Movies In Main Room : When the client enters the main room, the server sends 
+       a message which contains the list of all movies in the main room.
+       Type : value 0100
+       Text length : the total length in bytes of the Text field
+       Text : this field contains the list of all names of movies and their IP Address.
+     </t>
+    
+     <t>
+     * 6. User Sends Message to Server: When the client chat with other users, the client sends
+       message to the server. 
+       Type : value 0101
+       Text length : the total length in bytes of the Text field
+       Text : this field contains the content of chatting as well as the user-name.
+     </t>
+     
+     <t>
+     * 7. Server Sends Message to All Users: Once server receives a message, he will send this message
+       to all the users in certain room.
+       Type : value 0110
+       Text length : the total length in bytes of the Text field
+       Text : this field contains the content of chatting as well as the user-name.
+     </t>
+     <t>
+     * 8. Enter One Movie Room: Set when a client wants to enter one movie room.
+       Type : value 0111
+       Text length : the total length in bytes of the Text field
+       Text : this field contains IP address of the movie as well as the movie-name.
+     </t>
+     <t>
+     * 9. List of All Users in Movie Room: When the client enters the room, the server sends a
+       message which contains the list of all users and their status in the main room.
+       Type : value 1000
+       Text length : the total length in bytes of the Text field
+       Text : this field contains the list of all names of users in movie room.
+     </t>
+     
+     <t>
+     * 10. Leave the Movie Room : Indicates that a client wants to leave the movie room and
+       he should be back to main room.
+       Type : value 1001
+       Text length : value 0
+     </t>
+      
+     <t>
+     * 11. Leave the Main Room: Indicates that a client wants to leave the main room and he should
+       be back to login window.
+       Type : value 1010
+       Text length : value 0
+      </t>
+
+    </section>
+    <section title="Example scenario">
+    <section title="Scenario 1: Login">
+    <t>
+    This first scenario describes the case where a new client ’Alice’. Alice sends a Login Request to 
+    the server. Once the server receives that request, he will judge whether the login request is legal, 
+    if correct the server will send the ML(movie list) and UL(user list) to Alice, then again the server 
+    will send the new UL to other users(i.g. one man called Paul) in the MR(main room).In this case, we assume
+    that it exists just one film called "pulp fiction" in the ML, and the users are Alice and Paul.
+    </t>
+
+    <t>
+    <figure>
+    <artwork>
+
+
+     Alice                            Server                    Paul                      
+        |                               |                        |
+        |   Msg 1 (Login Request)       |                        |
+        |-----------------------------&gt;|                      |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 2 (Request Legal)       |                        |
+       |&lt;----------------------------|                        |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 3 (Movie List)          |                        |
+        |-----------------------------&gt;|                      |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 4 (Movie List ACK)      |                        |
+       |&lt;----------------------------|                        |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 5 (User List)           |                        |
+        |-----------------------------&gt;|                      |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 6 (User List ACK)       |                        |
+       |&lt;----------------------------|                        |
+        |                               |                        |
+        |                               |    Msg 7 (User List)   |
+        |                               |----------------------&gt;|
+        |                               |                        |
+        |                               |  Msg 8 (User List ACK) |
+        |                              |&lt;---------------------|
+        |                               |                        |
+        |                               |                        |                       
+
+    
+    </artwork></figure></t>
+
+    </section><!--End of senario 1-->
+    </section><!--End of example senario-->
+
+   
+
+</middle>
+
+</rfc>
+
+
+

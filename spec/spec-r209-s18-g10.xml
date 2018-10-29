@@ -1,0 +1,1064 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This template is for creating an Internet Draft using xml2rfc,
+     which is available here: http://xml.resource.org. -->
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!-- One method to get references from the online citation libraries.
+     There has to be one entity for each item to be referenced.
+     An alternate method (rfc include) is described in the references. -->
+
+<!ENTITY RFC2629 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2629.xml">
+]>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs),
+     please see http://xml.resource.org/authoring/README.html. -->
+<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
+     (Here they are set differently than their defaults in xml2rfc v1.32) -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes"?>
+<!-- generate a ToC -->
+<?rfc tocdepth="4"?>
+<!-- the number of levels of subsections in ToC. default: 3 -->
+<!-- control references -->
+<?rfc symrefs="yes"?>
+<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
+<?rfc sortrefs="yes" ?>
+<!-- sort the reference entries alphabetically -->
+<!-- control vertical white space
+     (using these PIs as follows is recommended by the RFC Editor) -->
+<?rfc compact="yes" ?>
+<!-- do not start each main section on a new page -->
+<?rfc subcompact="no" ?>
+<!-- do not display copyright and other IETF-related stuff -->
+<?rfc private="(c) GROUP XXXX, 2013" ?>
+
+<rfc category="info" docName="spec-r209-s18-g10" ipr="trust200902">
+  <!-- category values: std, bcp, info, exp, and historic
+     ipr values: full3667, noModification3667, noDerivatives3667
+     you can add the attributes updates="NNNN" and obsoletes="NNNN"
+     they will automatically be output with "(if approved)" -->
+
+  <!-- ***** FRONT MATTER ***** -->
+
+  <front>
+    <!-- The abbreviated title is used in the page header - it is only necessary if the
+         full title is longer than 39 characters -->
+
+    <title abbrev="c2w-protocol">Group 10: c2w protocol specification proposal
+    </title>
+
+    <!-- add 'role="editor"' below for the editors if appropriate -->
+
+
+    <author fullname="Xiaorui HUO" initials="Xiaorui"
+            surname="HUO">
+      <organization>IMT Atlantique</organization>
+
+      <address>
+        <postal>
+          <street></street>
+
+          <!-- Reorder these if your country does things differently -->
+
+          <city>Brest</city>
+
+          <region></region>
+
+          <code></code>
+
+          <country>France</country>
+        </postal>
+
+
+
+        <email>xiaorui.huo@telecom-bretagne.eu</email>
+
+        <!-- uri and facsimile elements may also be added -->
+      </address>
+    </author>
+    
+    <author fullname="Haipeng LI" initials="Haipeng"
+            surname="LI">
+      <organization>IMT Atlantique</organization>
+
+      <address>
+        <postal>
+          <street></street>
+
+          <!-- Reorder these if your country does things differently -->
+
+          <city>Brest</city>
+
+          <region></region>
+
+          <code></code>
+
+          <country>France</country>
+        </postal>
+
+
+
+        <email>haipeng.li@telecom-bretagne.eu</email>
+
+        <!-- uri and facsimile elements may also be added -->
+      </address>
+    </author>                                                                        
+    
+
+    <date month="Feb" year="2018" />
+
+    <!-- If the month and year are both specified and are the current ones, xml2rfc will fill
+         in the current day for you. If only the current year is specified, xml2rfc will fill
+	 in the current day and month for you. If the year is not the current one, it is
+	 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the
+	 purpose of calculating the expiry date).  With drafts it is normally sufficient to
+	 specify just the year. -->
+
+    <keyword>c2w</keyword>
+
+    <!-- Keywords will be incorporated into HTML output
+         files in a meta tag but they have no effect on text or nroff
+         output. If you submit your draft to the RFC Editor, the
+         keywords will be used for the search engine. -->
+
+    <abstract>
+      <t>
+      The document is a specification for a session protocol capable of supporting the
+      application Chat While Watching(c2w).The protocol is used between clients and server.
+      The goal of this protocol is to allow a client to chat with other users in the main 
+      room or movie room.
+      </t>
+    </abstract>
+  </front>
+
+  <middle>
+ 
+    <section title="Introduction">
+      <t>
+      The goal of the c2w protocol specification is to allow clients to chat with other 
+      users in the main room or movie room. For the sake of simplicity, the message format 
+      is the same for all the messages. This protocol is able to be implemented either with
+      TCP or UDP.
+      </t>
+    
+    <section title="Functions">
+      <t>
+      When a client logins in to the server, he/she enters the name(or IP address) and the 
+      port number of the server as well as his/her user-name in the login window. If the 
+      user-name is already used by other client, this client will receive a connection 
+      failed message from the server.
+      </t>
+      
+      <t>
+      If login is successful, this client will be directed to the "main room" and the server
+      sends two messages to this client,one is the list of all users in the system(specifying
+      whether they are available "A"(they are in the main room)or whether they are in a Movie
+      room "M"), the other one is the list of all the available movies. The user can send 
+      messages to other users in the main room.
+      </t>
+      
+      <t>
+      While in the "main room", the user can join one of the movies, the application shows a
+      third window with the list of all the users in this movie room.The user can send messages 
+      to other users in the movie room and leave the movie room to go back to the main room.
+      </t>
+      
+      <t>
+      The user can leave the main room and go back to the login window.
+      </t>
+
+
+    </section><!--End of function-->
+    </section><!--End of introduction-->
+
+    <section title="Message format">
+    <t>
+    All messages have the same format, shown in figure Figure 1.
+    </t>
+
+    <t>
+    <figure align="center" anchor="sample_pkt">
+    <artwork>
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |A|   |       |                               |                 |
+    |C| R | Type  |      Text Length              |                 |
+    |K|   |       |                               |                 |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+    |                                                               |
+    |                                                               |
+    .                                                               .
+    .                  Text(variable length)	                    .
+    .                                                               .
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    
+    </artwork></figure></t>
+
+    <t>
+    * ACK field(1 bit): This field is set to 1 to acknowledge a previous message，
+      the default value is 0.
+
+    </t>
+    
+    <t>
+    * R field (2 bits) : This field indicates the type of corresponding room.</t>
+      <t>00 : main room</t>
+      <t>01 : movie room</t>
+      <t>11 : other case</t>
+    
+    
+    <t>
+    * Type field (4 bits) : This field indicates the type of each message (refer to a table
+      (definition of the type) for more details).
+    </t>
+    
+    <t>
+    * Text Length field (16 bits): This field specifies the total length in bytes of the Text. 
+      The user must ensure that this field contains the correct value.
+    </t>
+    
+    <t>
+    * Text field (variable length): This field contains the contente that is the object of the
+      message, encoded in ASCII.  
+    </t>
+    
+    <texttable anchor="table1" title="Definition of the Type">
+
+          <ttcol align="center">Type</ttcol>
+
+          <ttcol align="center">Message Name</ttcol>
+
+          <c>0000</c>
+
+          <c>Connection To Main Room</c>
+
+          <c>0001</c>
+
+          <c>Connection Successful</c>
+
+          <c>0010</c>
+
+          <c>Connection Failed </c>
+   
+          <c>0011</c>
+
+          <c>List of All Users In Main Room </c>
+
+          <c>0100</c>
+
+          <c>List of All Movies In Main Room</c>
+
+          <c>0101</c>
+
+          <c>User Sends Message to Server</c>
+
+          <c>0110</c>
+
+          <c>Server Sends Message to All Users</c>
+
+          <c>0111</c>
+
+          <c>Enter One Movie Room </c>
+
+          <c>1000</c>
+
+          <c>List of All Users in Movie Room</c>
+ 
+          <c>1001</c>
+
+          <c>Leave the Movie Room</c>
+ 
+          <c>1010</c>
+
+          <c>Leave the Main Room</c>
+          
+          <c>1111</c>
+
+          <c>Error</c>
+          
+
+    </texttable>
+    
+    </section>
+
+    <section title="Type of Message">
+    	
+    <section title="Connection To Main Room">
+    <t>
+     * Connection To Main Room : When a new client wants to login in to the server, the client
+       sends the request to server.</t>
+       
+       <t>ACK : 0</t>
+       <t>R : 11</t>
+       <t>Type : 0000</t>
+       <t>Text Length : the total length in bytes of the Text field</t>
+       <t>Text : this field contains the user-name.</t>
+       
+    
+    
+    <t>
+    <figure align="center" anchor="sample_pkt1">
+    <artwork>
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |A|   |       |                               |                 |
+    |C| R | Type  |      Text Length              |                 |
+    |K|   |       |                               |                 |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+    |                                                               |
+    |                                                               |
+    .                    User-name                                  .
+    .                 	                                            .
+    .                                                               .
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    
+    </artwork></figure></t>
+    </section>
+    
+    <section title="Connection Successful">
+    <t>
+     * Connection Successful : If the client connects successfully to the main room, the server
+       sends a message to the client.</t>
+       <t>ACK : 0</t>
+       <t>R : 11</t>
+       <t>Type : 0001</t>
+       <t>Text length : 0</t>
+       <t>Text : this field is empty.</t>
+       
+    
+    
+    <t>
+    <figure align="center" anchor="sample_pkt2">
+    <artwork>
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |A|   |       |                               |                 
+    |C| R | Type  |      Text Length              |                 
+    |K|   |       |                               |                 
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 
+             
+    
+    </artwork></figure></t>
+    </section>
+    
+     <section title="Connection Failed">
+     <t>  
+     * Connection Failed : If the user-name is already used by other users, the client connects   
+       unsuccessfully to the main room, the server sends this message to the client.</t>
+          
+          <t>ACK : 0</t>
+          <t>R : 11</t>
+          <t>Type : 0010</t>
+          <t>Text length : 0</t>
+          <t>Text : this field is empty.</t>
+     
+     
+     
+    <t>
+    <figure align="center" anchor="sample_pkt3">
+    <artwork>
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |A|   |       |                               |                 
+    |C| R | Type  |      Text Length              |                 
+    |K|   |       |                               |                 
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   
+    
+    </artwork></figure></t>
+    </section>
+      
+     <section title="List of All Users In Main Room">  
+     <t>
+     * List of All Users In Main Room : When the client enters the main room, the server sends a
+       message which contains the list of all users in the main room.</t>
+       <t>ACK : 0</t>
+       <t>R : 00</t>
+       <t>Type : 0011</t>
+       <t>Text length : the total length in bytes of the Text field</t>
+       <t>Text : this field contains the list of all names of users and their status
+          as well as the number of users.</t>
+     
+     
+    <t>
+    <figure align="center" anchor="sample_pkt4">
+    <artwork>
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |A|   |       |                               |                 |
+    |C| R | Type  |      Text Length              | Number of users |
+    |K|   |       |                               |                 |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+    | Statu of user 1     Name of user 1                            |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                                                     
+                               .
+                               .
+    .                 	                                            .
+    .                                                               .
+    |  Statu of user N     Name of user N                           |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+    </artwork></figure></t>
+     </section>
+     
+     <section title="List of All Movies In Main Room">
+     <t>
+     * List of All Movies In Main Room : When the client enters the main room, the server sends 
+       a message which contains the list of all movies in the main room.</t>
+       <t>ACK : 0</t>
+       <t>R : 00</t>
+       <t>Type : 0100</t>
+       <t>Text length : the total length in bytes of the Text field</t>
+       <t>Text : this field contains the list of all names of movies and their IP Address
+          as well as the number of movies.</t>
+     
+     
+    <t>
+    <figure align="center" anchor="sample_pkt5">
+    <artwork>
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |A|   |       |                               |                 |
+    |C| R | Type  |      Text Length              | Number of movies|
+    |K|   |       |                               |                 |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+    | IP Address of movie 1     Name of movie 1                     |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                                                     
+                               .
+                               .
+    .                 	                                            .
+    .                                                               .
+    | IP Address of movie N     Name of movie N                     |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+    </artwork></figure></t>
+     </section>
+    
+     <section title="User Sends Message to Server">
+     <t>
+     * User Sends Message to Server: When the client chats with other users in the
+       main room or movie room, the client sends message to the server.</t> 
+       <t>ACK : 0</t>
+       <t>R : 00/01</t>
+       <t>Type : 0101</t>
+       <t>Text length : the total length in bytes of the Text field</t>
+       <t>Text : this field contains the content of chatting as well as the user-name.</t>
+    
+     
+    <t>
+    <figure align="center" anchor="sample_pkt6">
+    <artwork>
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |A|   |       |                               |                 |
+    |C| R | Type  |      Text Length              |                 |
+    |K|   |       |                               |                 |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+    |                                                               |
+    |                                                               |
+    . User-name    Content of chatting                              .
+    .                 	                                            .
+    .                                                               .
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    
+    </artwork></figure></t>
+     </section>
+     
+     <section title="Server Sends Message to All Users">
+     <t>
+     * Server Sends Message to All Users: Once server receives a message, he will send this message
+       to all the users in certain room.</t>
+       <t>ACK : 0</t>
+       <t>R : 00/01</t>
+       <t>Type : 0110</t>
+       <t>Text length : the total length in bytes of the Text field</t>
+       <t>Text : this field contains the content of chatting as well as the user-name.</t>
+     
+     
+    <t>
+    <figure align="center" anchor="sample_pkt7">
+    <artwork>
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |A|   |       |                               |                 |
+    |C| R | Type  |      Text Length              |                 |
+    |K|   |       |                               |                 |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+    |                                                               |
+    |                                                               |
+    . User-name    Content of chatting                              .
+    .                 	                                            .
+    .                                                               .
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    
+    </artwork></figure></t>
+    </section>
+    
+    <section title="Enter One Movie Room">
+     <t>
+     * Enter One Movie Room: Set when a client wants to enter one movie room.</t>
+       <t>ACK : 0</t>
+       <t>R : 00</t>
+       <t>Type : 0111</t>
+       <t>Text length : the total length in bytes of the Text field</t>
+       <t>Text : this field contains the movie-name.</t>
+     
+    
+    <t>
+    <figure align="center" anchor="sample_pkt8">
+    <artwork>
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |A|   |       |                               |                 |
+    |C| R | Type  |      Text Length              |                 |
+    |K|   |       |                               |                 |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+    |                                                               |
+    |                                                               |                            
+    .                    Name of movie                 	            .
+    .                                                               .
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+    </artwork></figure></t>
+    </section>
+     
+     <section title=" List of All Users in Movie Room">
+     <t>
+     * List of All Users in Movie Room: When the client enters the room, the server sends a
+       message which contains the list of all users in the main room.</t>
+       <t>ACK : 0</t>
+       <t>R : 01</t>
+       <t>Type : 1000</t>
+       <t>Text length : the total length in bytes of the Text field</t>
+       <t>Text : this field contains the list of all names of users as well as the number of
+          users in movie room.</t>
+     
+      
+    <t>
+    <figure align="center" anchor="sample_pkt9">
+    <artwork>
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |A|   |       |                               |                 |
+    |C| R | Type  |      Text Length              | Number of users |
+    |K|   |       |                               |                 |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+    |     Name of user 1                                            |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                                                     
+                               .
+                               .
+    .                 	                                            .
+    .                                                               .
+    |      Name of user N                                           |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+    </artwork></figure></t>
+    </section>
+    
+     <section title=" Leave the Movie Room"> 
+     <t>
+     * Leave the Movie Room : Indicates that a client wants to leave the movie room and
+       he should be back to main room.</t>
+       <t>ACK : 0</t>
+       <t>R : 01</t> 
+       <t>Type : 1001</t>
+       <t>Text length : 0</t>
+       <t>Text : this field is empty.</t>
+     
+    
+    <t>
+    <figure align="center" anchor="sample_pkt10">
+    <artwork>
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |A|   |       |                               |                 
+    |C| R | Type  |      Text Length              |                 
+    |K|   |       |                               |                 
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 
+   
+    
+    </artwork></figure></t>
+    </section>
+     
+     <section title=" Leave the Main Room">  
+     <t>
+     * Leave the Main Room: Indicates that a client wants to leave the main room and he should
+       be back to login window.</t>
+       <t>ACK : 0</t>
+       <t>R : 00</t>  
+       <t>Type : 1010</t>
+       <t>Text length : 0</t>
+       <t>Text : this field is empty.</t>
+      
+      
+    <t>
+    <figure align="center" anchor="sample_pkt11">
+    <artwork>
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |A|   |       |                               |                 
+    |C| R | Type  |      Text Length              |                 
+    |K|   |       |                               |                 
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 
+   
+    
+    </artwork></figure></t>
+    </section>
+    
+    <section title=" Error"> 
+    <t>
+    * Error: Invalide Message means all the other errors.</t>
+      <t>ACK : 1</t>
+      <t>R : 11</t>    
+      <t>Type : 1111</t>
+      <t>Text length : the total length in bytes of the Text field</t>
+      <t>Text : this field indicates the type of error(refer to a table(Type of
+         error) for more details). The first byte is used to indicate.</t>
+    
+    
+     <texttable anchor="table2" title=" Type of error ">
+
+          <ttcol align="center">Type</ttcol>
+
+          <ttcol align="center">Error Name</ttcol>
+
+          <c>00000000</c>
+
+          <c>Illegal Format of Message</c>
+   
+          <c>00000001</c>
+
+          <c>Main room full</c>
+
+          <c>00000010</c>
+
+          <c>Movie room full</c>
+
+          <c>00000011</c>
+
+          <c>Movie list full</c>
+
+    </texttable>
+    
+     
+     <t> Illegal Format of Message : the length of a message sent by the client
+         must be lower than 300 bytes.</t>
+     <t> Main room full : The number of users in the main name should be less 
+         than 255.</t>
+     <t> Movie room full : The number of users in the movie name should be less 
+         than 255. </t>
+     <t> Movie list full : The list of movies should be less than 255.</t>
+
+    
+    <t>
+    <figure align="center" anchor="sample_pkt12">
+    <artwork>
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |A|   |       |                               |                 |
+    |C| R | Type  |      Text Length              |                 |
+    |K|   |       |                               |                 |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                 +
+    |                                                               |
+    |                                                               |                            
+    .                    Type of error                 	            .
+    .                                                               .
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+    </artwork></figure></t>
+    
+    </section>
+    
+    </section>
+    
+    <section title="Reliability">
+    <t>
+     When a client sent a request, but he hasn't received a ACK reply. In order not to overload servers,
+     clients should wait at least 2 seconds before resending a request.
+    </t>
+    </section>
+    
+    <section title="Example scenario">
+    <t>The values of each field are hexadecimal.</t>
+    <section title="Scenario 1: Login">
+    <t>
+    This first scenario describes the case where a new client ’Alice’. Alice sends a Login Request to 
+    the server. Once the server receives that request, he will judge whether the login request is legal, 
+    if correct the server will send the ML(movie list) and UL(user list) to Alice, then again the server 
+    will send the new UL to other users(i.g. one man called Bob) in the MR(main room).In this case, we 
+    assume that it exists just one film called "fiction" in the ML, and the users are Alice and Bob.
+    </t>
+
+    <t>
+    <figure>
+    <artwork>
+
+
+     Alice                            Server                    Bob                      
+        |                               |                        |
+        |   Msg 1 (Login Request)       |                        |
+        |------------------------------&gt;|                        |
+        |                               |                        |
+        |                               |                        |
+        |  Msg 2 (Connection successful)|                        |
+        |&lt;------------------------------|                        |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 3 (Movie List)          |                        |
+        |------------------------------&gt;|                        |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 4 (Movie List ACK)      |                        |
+        |&lt;------------------------------|                        |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 5 (User List)           |                        |
+        |------------------------------&gt;|                        |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 6 (User List ACK)       |                        |
+        |&lt;------------------------------|                        |
+        |                               |                        |
+        |                               |    Msg 7 (User List)   |
+        |                               |-----------------------&gt;| 
+        |                               |                        |
+        |                               |  Msg 8 (User List ACK) |
+        |                               |&lt;-----------------------|
+        |                               |                        |
+        |                               |                        |                       
+
+    
+    </artwork></figure></t>
+    <t> Msg 1 (Login Request)</t>
+    <t>ACK: 0</t>
+    <t>R: 03</t>
+    <t>Type: 00</t>
+    <t>Text Length: 05</t>
+    <t>Text : 41 6c 69 63 65 </t>
+
+    <t> Msg 2 (Connection successful)</t>
+    <t>ACK: 0</t>
+    <t>R: 03</t>
+    <t>Type: 01</t>
+    <t>Text Length: 00</t>
+
+    <t> Msg 3 (Movie List)</t>
+    <t>ACK: 0</t>
+    <t>R: 00</t>
+    <t>Type: 04</t>
+    <t>Text Length: 08</t>
+    <t>Text : 01 66 69 63 74 69 6f 6e  </t>
+
+    <t> Msg 4 (Movie List ACK)</t>
+    <t>ACK: 1</t>
+    <t>R: 00</t>
+    <t>Type: 04</t>
+    <t>Text Length: 00</t>
+    
+    <t> Msg 5 (User List)</t>
+    <t>ACK: 0</t>
+    <t>R: 00</t>
+    <t>Type: 03</t>
+    <t>Text Length: 0B</t>
+    <t>Text : 02 4e 41 6c 69 63 65 4e 42 6f 62  </t>
+    
+    <t> Msg 6 (User List ACK)</t>
+    <t>ACK: 1</t>
+    <t>R: 00</t>
+    <t>Type: 03</t>
+    <t>Text Length: 00</t>
+
+    </section><!--End of senario 1-->
+    
+    <section title="Scenario 2: User enters into a Movie Room">
+     <t>
+    Alice decides to enter a Movie Room called "fiction", she will send a room request to the server, 
+    then the server responses the room request ACK to her as well as the User List.Then the server 
+    will send the newest User List to the users who were already in the Movie Room, for example here Bob.  
+    </t>
+
+    <t>
+    <figure>
+    <artwork>
+
+
+     Alice                            Server                    Bob                      
+        |                               |                        |
+        |   Msg 1 (Room Request)        |                        |
+        |------------------------------&gt;|                        |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 2 ( Room Request ACK)   |                        |
+        |&lt;------------------------------|                        |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 3 (User List)           |                        |
+        |------------------------------&gt;|                        |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 4 (User List ACK)       |                        |
+        |&lt;------------------------------|                        |
+        |                               |                        |
+        |                               |                        |
+        |                               |                        |
+        |                               |    Msg 5 (User List)   |
+        |                               |-----------------------&gt;| 
+        |                               |                        |
+        |                               |  Msg 6 (User List ACK) |
+        |                               |&lt;-----------------------|
+        |                               |                        |
+        |                               |                        |                       
+
+    
+    </artwork></figure></t>
+
+    <t> Msg 1 (Room Request)</t>
+    <t>ACK: 0</t>
+    <t>R: 00</t>
+    <t>Type: 07</t>
+    <t>Text Length: 07</t>
+    <t>Text : 66 69 63 74 69 6f 6e </t>
+
+    <t> Msg 2 (Room Request ACK)</t>
+    <t>ACK: 1</t>
+    <t>R: 00</t>
+    <t>Type: 07</t>
+    <t>Text Length: 00</t>
+
+    <t> Msg 3 (User List)</t>
+    <t>ACK: 0</t>
+    <t>R: 01</t>
+    <t>Type: 08</t>
+    <t>Text Length: 09</t>
+    <t>Text : 02 41 6c 69 63 65 42 6f 62  </t>
+
+    <t> Msg 4 (User List ACK)</t>
+    <t>ACK: 1</t>
+    <t>R: 00</t>
+    <t>Type: 08</t>
+    <t>Text Length: 00</t>
+    </section><!--End of senario 2-->	
+    
+    
+    <section title="Scenario 3: Users chat in the room">
+    <t>
+    We suppose that Alice and Bob were in the same room(for example,they are in Movie Room), and 
+    Alice wants to chat with Bob, Alice will send a message to the server,and the server will
+    response a ACK again. Finally, the server will send a message to Bob, and so on Bob will 
+    generate a ACK back to server,vice versa.
+    </t>
+
+    <t>
+    <figure>
+    <artwork>
+
+
+     Alice                            Server                      Bob                      
+        |                               |                          |
+        | Msg 1 (Message Request)       |                          |
+        |------------------------------&gt;|                          |
+        |                               |                          |
+        |                               |                          |
+        | Msg 2 ( Message Request ACK)  |                          |
+        |&lt;------------------------------|                          |
+        |                               |                          |
+        |                               |                          |
+        |                               | Msg 3 (Message Request)  |
+        |                               |-------------------------&gt;| 
+        |                               |                          |
+        |                               |Msg 4(Message Request ACK)|
+        |                               |&lt;-------------------------|
+        |                               |                          |
+        |                               |                          |                       
+        |                               | Msg 5(Message Request)   |
+        |                               |&lt;-------------------------| 
+        |                               |                          |
+        |                               |Msg 6(Message Request ACK)|
+        |                               |-------------------------&gt;| 
+        |                               |                          |
+        | Msg 7( Message Request )      |                          |
+        |&lt;------------------------------|                          |
+        | Msg 8(Message Request ACK)    |                          |
+        |------------------------------&gt;|                          |
+        |                               |                          |
+        
+    </artwork></figure></t>
+
+    <t> Msg 1 (Message Request)</t>
+    <t>ACK: 0</t>
+    <t>R: 01</t>
+    <t>Type: 05</t>
+    <t>Text Length: 0A</t>
+    <t>Text : 41 6c 69 63 65 48 65 6c 6c 6f </t>
+
+    <t> Msg 2 (Message Request ACK)</t>
+    <t>ACK: 1</t>
+    <t>R: 01</t>
+    <t>Type: 05</t>
+    <t>Text Length: 00</t>
+
+    <t> Msg 3 (Message Request)</t>
+    <t>ACK: 0</t>
+    <t>R: 01</t>
+    <t>Type: 06</t>
+    <t>Text Length: 0A</t>
+    <t>Text : 41 6c 69 63 65 48 65 6c 6c 6f </t>
+
+    <t> Msg 4 (Message Request ACK)</t>
+    <t>ACK: 1</t>
+    <t>R: 01</t>
+    <t>Type: 06</t>
+    <t>Text Length: 00</t>
+    </section><!--End of senario 3-->	
+    <section title="Scenario 4: User leaves from a Movie Room">
+    <t>
+    Alice decides to leave the Movie Room, she will send a leave request to the server,then the
+    server responses the leave request ACK to her as well as the User List of Main Room. Then
+    the server will send the newest User List to the users who were already in the Main Room.
+    (we assume that Bob was in the Main Room)
+    </t>
+
+    <t>
+    <figure>
+    <artwork>
+
+
+     Alice                            Server                    Bob                      
+        |                               |                        |
+        |   Msg 1 (Leave Request)       |                        |
+        |------------------------------&gt;|                        |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 2 ( Leave Request ACK)  |                        |
+        |&lt;------------------------------|                        |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 3 (User List)           |                        |
+        |------------------------------&gt;|                        |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 4 (User List ACK)       |                        |
+        |&lt;------------------------------|                        |
+        |                               |                        |
+        |                               |                        |
+        |                               |                        |
+        |                               |    Msg 5 (User List)   |
+        |                               |-----------------------&gt;| 
+        |                               |                        |
+        |                               |  Msg 6 (User List ACK) |
+        |                               |&lt;-----------------------|
+        |                               |                        |
+        |                               |                        |                       
+
+    
+    </artwork></figure></t>
+
+    <t> Msg 1 (Leave Request)</t>
+    <t>ACK: 0</t>
+    <t>R: 01</t>
+    <t>Type: 09</t>
+    <t>Text Length: 00</t>
+
+    <t> Msg 2 (Leave Request ACK)</t>
+    <t>ACK: 1</t>
+    <t>R: 01</t>
+    <t>Type: 09</t>
+    <t>Text Length: 00</t>
+
+    </section><!--End of senario 4-->	
+    
+    <section title="Scenario 5: User leaves from a Main Room">
+    <t>
+    Alice decides to leave the Main Room, she will send a leave request to the server, then 
+    the server responses the leave request ACK to her.
+    </t>
+
+    <t>
+    <figure>
+    <artwork>
+
+
+     Alice                            Server                    Bob                      
+        |                               |                        |
+        |   Msg 1 (Leave Request)       |                        |
+        |------------------------------&gt;|                        |
+        |                               |                        |
+        |                               |                        |
+        |   Msg 2 ( Leave Request ACK)  |                        |
+        |&lt;------------------------------|                        |
+        |                               |                        |
+        |                               |                        |
+        |                               |                        |
+        |                               |    Msg 3(User List)    |
+        |                               |-----------------------&gt;| 
+        |                               |                        |
+        |                               |  Msg 4 (User List ACK) |
+        |                               |&lt;-----------------------|
+        |                               |                        |
+        |                               |                        |                       
+
+    
+    </artwork></figure></t>
+    <t> Msg 1 (Leave Request)</t>
+    <t>ACK: 0</t>
+    <t>R: 00</t>
+    <t>Type: 0A</t>
+    <t>Text Length: 00</t>
+
+    <t> Msg 2 (Leave Request ACK)</t>
+    <t>ACK: 1</t>
+    <t>R: 00</t>
+    <t>Type: 0A</t>
+    <t>Text Length: 00</t>
+    </section><!--End of senario 5-->	
+    	
+    </section><!--End of example senario-->
+
+   <section title="Conclusion">
+   	<t>
+   	In conclusion, this specification is to allow clients to chat with other users in the
+    main room or movie room. We use the same message format for transferring. By defining the
+    type of message, we distinguish different functions. Considering the loss of the message, 
+    we use ACK to ensure the reception of the message. 
+   	
+   	</t>
+   </section>
+
+</middle>
+
+</rfc>
+
+
+
